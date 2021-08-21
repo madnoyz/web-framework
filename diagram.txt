@@ -1,0 +1,47 @@
+
+
+class User
+attributes:     Attributes
+events:         Events
+sync:           ApiSync<UserProps>
+
+class Eventing
+on()
+trigger()
+
+class ApiSync<T>       - ApiSync is a generic class to customize the type of 'data' coming into save()
+save(id: num, data: T): AxiosPromise<T>
+fetch(id: number): AxiosPromise<T>
+
+generics example:
+class BlogPost
+attributes: Attributes
+events: Events
+sync: ApiSync<BlogPostProps>
+
+
+Caller ->   class User ->   class Attributes<T>
+            get()           class Eventing
+            set()           class ApiSync<T>
+            on()
+            trigger()
+            fetch()
+            save()
+
+class Attributes<T>
+    get(key: K): T[K]
+    set(update: T): void
+
+class Eventing
+    on(eventName: string, callback: () => {})
+    trigger(eventName: string): void
+
+class ApiSync<T>
+    fetch(id: number): Promise
+    save(data T): Promise
+
+Refactored to make Model class so they can be reused for anything
+
+class Model
+Moved all the class User to model.
+Created interfaces, so they can be accessed/inherited to eliminate the use of user.model.get().
