@@ -456,14 +456,11 @@ function hmrAcceptRun(bundle, id) {
 
 },{}],"4aleK":[function(require,module,exports) {
 var _user = require("./models/User");
-const user = _user.User.buildUser({
-    id: 1
+const collection = _user.User.buildUserCollection();
+collection.on('change', ()=>{
+    console.log(collection);
 });
-user.on('change', ()=>{
-    console.log(user);
-});
-user.fetch();
-console.log(user.isAdminUser());
+collection.fetch();
 
 },{"./models/User":"e3Dsv"}],"e3Dsv":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
@@ -474,6 +471,7 @@ var _model = require("./Model");
 var _attributes = require("./Attributes");
 var _apiSync = require("./ApiSync");
 var _eventing = require("./Eventing");
+var _collection = require("./Collection");
 const rootUrl = 'http://localhost:3000/users';
 class User extends _model.Model {
     static buildUser(attrs) {
@@ -482,41 +480,13 @@ class User extends _model.Model {
     isAdminUser() {
         return this.get('id') == 1;
     }
+    static buildUserCollection() {
+        return new _collection.Collection(rootUrl, (json)=>User.buildUser(json)
+        );
+    }
 }
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hJk6l","./Model":"j0S9y","./Attributes":"6i3Fe","./ApiSync":"bztYB","./Eventing":"bxYlr"}],"hJk6l":[function(require,module,exports) {
-exports.interopDefault = function(a) {
-    return a && a.__esModule ? a : {
-        default: a
-    };
-};
-exports.defineInteropFlag = function(a) {
-    Object.defineProperty(a, '__esModule', {
-        value: true
-    });
-};
-exports.exportAll = function(source, dest) {
-    Object.keys(source).forEach(function(key) {
-        if (key === 'default' || key === '__esModule') return;
-        // Skip duplicate re-exports when they have the same value.
-        if (key in dest && dest[key] === source[key]) return;
-        Object.defineProperty(dest, key, {
-            enumerable: true,
-            get: function() {
-                return source[key];
-            }
-        });
-    });
-    return dest;
-};
-exports.export = function(dest, destName, get) {
-    Object.defineProperty(dest, destName, {
-        enumerable: true,
-        get: get
-    });
-};
-
-},{}],"j0S9y":[function(require,module,exports) {
+},{"./Model":"j0S9y","./Attributes":"6i3Fe","./ApiSync":"bztYB","./Eventing":"bxYlr","./Collection":"2FL6z","@parcel/transformer-js/src/esmodule-helpers.js":"hJk6l"}],"j0S9y":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "Model", ()=>Model
@@ -550,7 +520,39 @@ class Model {
     }
 }
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hJk6l"}],"6i3Fe":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"hJk6l"}],"hJk6l":[function(require,module,exports) {
+exports.interopDefault = function(a) {
+    return a && a.__esModule ? a : {
+        default: a
+    };
+};
+exports.defineInteropFlag = function(a) {
+    Object.defineProperty(a, '__esModule', {
+        value: true
+    });
+};
+exports.exportAll = function(source, dest) {
+    Object.keys(source).forEach(function(key) {
+        if (key === 'default' || key === '__esModule') return;
+        // Skip duplicate re-exports when they have the same value.
+        if (key in dest && dest[key] === source[key]) return;
+        Object.defineProperty(dest, key, {
+            enumerable: true,
+            get: function() {
+                return source[key];
+            }
+        });
+    });
+    return dest;
+};
+exports.export = function(dest, destName, get) {
+    Object.defineProperty(dest, destName, {
+        enumerable: true,
+        get: get
+    });
+};
+
+},{}],"6i3Fe":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "Attributes", ()=>Attributes
@@ -1984,6 +1986,39 @@ class Eventing {
     }
 }
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hJk6l"}]},["9kYl3","4aleK"], "4aleK", "parcelRequirea763")
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"hJk6l"}],"2FL6z":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "Collection", ()=>Collection
+);
+var _eventing = require("./Eventing");
+var _axios = require("axios");
+var _axiosDefault = parcelHelpers.interopDefault(_axios);
+class Collection {
+    constructor(rootUrl, deserialize){
+        this.rootUrl = rootUrl;
+        this.deserialize = deserialize;
+        this.models = [];
+        this.events = new _eventing.Eventing();
+    }
+    get on() {
+        return this.events.on;
+    }
+    get trigger() {
+        return this.events.trigger;
+    }
+    fetch() {
+        _axiosDefault.default.get(this.rootUrl).then((response)=>{
+            response.data.forEach((value)=>{
+                // const user = User.buildUser(value); // changed to generic class K, deserialize
+                // this.models.push(user);
+                this.models.push(this.deserialize(value));
+            });
+        });
+        this.trigger('change');
+    }
+}
+
+},{"./Eventing":"bxYlr","axios":"iYoWk","@parcel/transformer-js/src/esmodule-helpers.js":"hJk6l"}]},["9kYl3","4aleK"], "4aleK", "parcelRequirea763")
 
 //# sourceMappingURL=index.b31310b1.js.map

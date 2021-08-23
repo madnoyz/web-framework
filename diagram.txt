@@ -45,3 +45,6 @@ Refactored to make Model class so they can be reused for anything
 class Model
 Moved all the class User to model.
 Created interfaces, so they can be accessed/inherited to eliminate the use of user.model.get().
+
+class Collection
+Used to collect/fetch data
