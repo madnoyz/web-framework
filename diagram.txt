@@ -48,3 +48,19 @@ Created interfaces, so they can be accessed/inherited to eliminate the use of us
 
 class Collection
 Used to collect/fetch data
+
+class UserForm
+template(): string  // find out what html to show
+render(): HtmlRenderer      // what the html should show
+eventsMap(): {key: () => void}
+onSetNameClick()
+onSetAgeClick()
+
+Move some elements of UserForm to HtmlRenderer (Composition)
+class HtmlRenderer
+parent: Element
+model: User
+render(template: string): void
+bindEvents(): void
+bindModel(): void
+

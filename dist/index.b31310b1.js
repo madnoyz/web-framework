@@ -455,14 +455,124 @@ function hmrAcceptRun(bundle, id) {
 }
 
 },{}],"4aleK":[function(require,module,exports) {
+var _userForm = require("./views/UserForm");
 var _user = require("./models/User");
-const collection = _user.User.buildUserCollection();
-collection.on('change', ()=>{
-    console.log(collection);
+const user = _user.User.buildUser({
+    name: 'NAME',
+    age: 20
 });
-collection.fetch();
+const root = document.getElementById('root');
+if (root) {
+    const userForm = new _userForm.UserForm(root, user);
+    userForm.render();
+} else throw new Error('Root element not found');
+const userForm = new _userForm.UserForm(root, user);
+userForm.render();
 
-},{"./models/User":"e3Dsv"}],"e3Dsv":[function(require,module,exports) {
+},{"./views/UserForm":"cpp6A","./models/User":"e3Dsv"}],"cpp6A":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "UserForm", ()=>UserForm
+);
+var _view = require("./View");
+class UserForm extends _view.View {
+    eventsMap() {
+        return {
+            'click:.set-age': this.onSetAgeClick,
+            'click:.set-name': this.onSetNameClick,
+            'click:.save-model': this.onSaveClick
+        };
+    }
+    template() {
+        return `\n            <div>\n                <input placeholder="${this.model.get('name')}"  />\n                <button class="set-name">Change Name</button>\n                <button class="set-age">Set Random Age</button>\n                <button class="save-model">Save User</button>\n            </div>\n        `;
+    }
+    constructor(...args){
+        super(...args);
+        this.onSetAgeClick = ()=>{
+            this.model.setRandomAge();
+        };
+        this.onSetNameClick = ()=>{
+            const input = this.parent.querySelector('input');
+            if (input) {
+                const name = input.value;
+                this.model.set({
+                    name
+                });
+            }
+        };
+        this.onSaveClick = ()=>{
+            this.model.save();
+        };
+    }
+}
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"hJk6l","./View":"ajmqQ"}],"hJk6l":[function(require,module,exports) {
+exports.interopDefault = function(a) {
+    return a && a.__esModule ? a : {
+        default: a
+    };
+};
+exports.defineInteropFlag = function(a) {
+    Object.defineProperty(a, '__esModule', {
+        value: true
+    });
+};
+exports.exportAll = function(source, dest) {
+    Object.keys(source).forEach(function(key) {
+        if (key === 'default' || key === '__esModule') return;
+        // Skip duplicate re-exports when they have the same value.
+        if (key in dest && dest[key] === source[key]) return;
+        Object.defineProperty(dest, key, {
+            enumerable: true,
+            get: function() {
+                return source[key];
+            }
+        });
+    });
+    return dest;
+};
+exports.export = function(dest, destName, get) {
+    Object.defineProperty(dest, destName, {
+        enumerable: true,
+        get: get
+    });
+};
+
+},{}],"ajmqQ":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "View", ()=>View
+);
+class View {
+    constructor(parent, model){
+        this.parent = parent;
+        this.model = model;
+        this.bindModel();
+    }
+    bindModel() {
+        this.model.on('change', ()=>{
+            this.render();
+        });
+    }
+    bindEvents(fragment) {
+        const eventsMap = this.eventsMap();
+        for(let eventKey in eventsMap){
+            const [eventName, selector] = eventKey.split(':');
+            fragment.querySelectorAll(selector).forEach((element)=>{
+                element.addEventListener(eventName, eventsMap[eventKey]);
+            });
+        }
+    }
+    render() {
+        this.parent.innerHTML = "";
+        const templateElement = document.createElement('template');
+        templateElement.innerHTML = this.template();
+        this.bindEvents(templateElement.content);
+        this.parent.append(templateElement.content);
+    }
+}
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"hJk6l"}],"e3Dsv":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "User", ()=>User
@@ -483,6 +593,12 @@ class User extends _model.Model {
     static buildUserCollection() {
         return new _collection.Collection(rootUrl, (json)=>User.buildUser(json)
         );
+    }
+    setRandomAge() {
+        const age = Math.round(Math.random() * 100);
+        this.set({
+            age: age
+        });
     }
 }
 
@@ -520,39 +636,7 @@ class Model {
     }
 }
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hJk6l"}],"hJk6l":[function(require,module,exports) {
-exports.interopDefault = function(a) {
-    return a && a.__esModule ? a : {
-        default: a
-    };
-};
-exports.defineInteropFlag = function(a) {
-    Object.defineProperty(a, '__esModule', {
-        value: true
-    });
-};
-exports.exportAll = function(source, dest) {
-    Object.keys(source).forEach(function(key) {
-        if (key === 'default' || key === '__esModule') return;
-        // Skip duplicate re-exports when they have the same value.
-        if (key in dest && dest[key] === source[key]) return;
-        Object.defineProperty(dest, key, {
-            enumerable: true,
-            get: function() {
-                return source[key];
-            }
-        });
-    });
-    return dest;
-};
-exports.export = function(dest, destName, get) {
-    Object.defineProperty(dest, destName, {
-        enumerable: true,
-        get: get
-    });
-};
-
-},{}],"6i3Fe":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"hJk6l"}],"6i3Fe":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "Attributes", ()=>Attributes
